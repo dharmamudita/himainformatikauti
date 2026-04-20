@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { Link } from 'react-router-dom';
+import ScoringPanel from '../components/admin/ScoringPanel';
 
 const AdminDashboard = () => {
   const { user: me } = useAuth();
@@ -19,7 +20,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [userForm, setUserForm] = useState({ name:'', npm:'', password:'', role:'member', divisi:'' });
-  const [kegForm, setKegForm] = useState({ kategori:'materi-soal', title:'', description:'', type:'soal', status:'open', openDate:'', closeDate:'', materiContent:'', questions:[], createdBy: me?.name || 'Admin' });
+  const [kegForm, setKegForm] = useState({ kategori:'rapat', title:'', description:'', status:'open', openDate:'', closeDate:'', createdBy: me?.name || 'Admin' });
   const [viewSub, setViewSub] = useState(null);
   const [subs, setSubs] = useState([]);
   const [attList, setAttList] = useState([]);
@@ -28,7 +29,7 @@ const AdminDashboard = () => {
   // Question builder state
   const [qForm, setQForm] = useState({ type:'pilihan_ganda', question:'', options:['','','',''], correctAnswer:0, points:20 });
 
-  const divisiList = ['Kaderisasi','Research & Development','Public Relation','Entrepreneurship','Kesekretariatan','Kemuslimahan','Media & Komunikasi'];
+  const divisiList = ['Hubungan Masyarakat','Sosial Masyarakat','Sumber Daya Manusia','Bina Prestasi','Komdigi','Ekonomi Kreatif'];
 
   const clearMsg = () => setTimeout(() => setSuccess(''), 2000);
 
@@ -64,12 +65,11 @@ const AdminDashboard = () => {
   const removeQuestion = (idx) => {
     setKegForm({ ...kegForm, questions: kegForm.questions.filter((_,i) => i !== idx) });
   };
-  const resetKegForm = () => setKegForm({ kategori:'materi-soal', title:'', description:'', type:'soal', status:'open', openDate:'', closeDate:'', materiContent:'', questions:[], createdBy: me?.name || 'Admin', jadwal:'', tempat:'', pemateri:'', hadiah:'' });
+  const resetKegForm = () => setKegForm({ kategori:'rapat', title:'', description:'', status:'open', openDate:'', closeDate:'', createdBy: me?.name || 'Admin', jadwal:'', tempat:'', pemateri:'' });
   const onSaveKeg = async (e) => {
     e.preventDefault(); setError('');
     if (!kegForm.title.trim()) { setError('Judul wajib diisi'); return; }
     const formData = { ...kegForm };
-    if (formData.kategori !== 'materi-soal') { delete formData.questions; delete formData.materiContent; delete formData.type; }
     if (editId) {
       await data.updateKegiatan(editId, formData); setSuccess('Kegiatan berhasil diperbarui!');
     } else {
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
   const downloadAttendancePDFLocal = (kegiatanId, kegiatanTitle) => {
     const codes = data.getAllCodesForKegiatan(kegiatanId);
     if (codes.length === 0) { alert('Belum ada member.'); return; }
-    const htmlContent = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Kode Absensi - ${kegiatanTitle}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;padding:30px;color:#333;background:#fff}.header{border-bottom:3px solid #006a4e;padding-bottom:12px;margin-bottom:8px}.header h1{font-size:20px;color:#006a4e}.header h2{font-size:14px;color:#666;font-weight:normal;margin-top:4px}.meta{font-size:11px;color:#999;margin-bottom:20px}table{width:100%;border-collapse:collapse}thead th{background:#006a4e;color:white;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px}tbody td{padding:10px 14px;border-bottom:1px solid #e5e7eb;font-size:12px}tbody tr:nth-child(even){background:#f9fafb}.code-cell{font-family:'Courier New',monospace;font-size:16px;font-weight:bold;color:#006a4e;letter-spacing:4px;background:#f0fdf4;padding:6px 10px;border-radius:6px;display:inline-block;border:1px dashed #006a4e}.footer{margin-top:30px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:10px;color:#999;text-align:center}.warning{background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:11px;color:#92400e}@media print{body{padding:15px}.no-print{display:none}}</style></head><body><div class="header"><h1>Kode Absensi Kegiatan</h1><h2>${kegiatanTitle}</h2></div><p class="meta">Tanggal cetak: ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} | Total: ${codes.length} peserta</p><div class="warning">RAHASIA - Setiap kode bersifat unik per individu.</div><table><thead><tr><th>No</th><th>Nama</th><th>NPM</th><th>Divisi</th><th>Kode Absensi</th></tr></thead><tbody>${codes.map((c,i)=>`<tr><td>${i+1}</td><td><strong>${c.name}</strong></td><td>${c.npm}</td><td>${c.divisi}</td><td><span class="code-cell">${c.code}</span></td></tr>`).join('')}</tbody></table><div class="footer">UKM KSEI RIIEF - UIN Raden Intan Lampung</div><div class="no-print" style="text-align:center;margin-top:20px"><button onclick="window.print()" style="padding:10px 24px;background:#006a4e;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer">Cetak / Simpan PDF</button></div><script>window.onload=function(){setTimeout(function(){window.print()},800)};<\/script></body></html>`;
+    const htmlContent = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Kode Absensi - ${kegiatanTitle}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;padding:30px;color:#333;background:#fff}.header{border-bottom:3px solid #006a4e;padding-bottom:12px;margin-bottom:8px}.header h1{font-size:20px;color:#006a4e}.header h2{font-size:14px;color:#666;font-weight:normal;margin-top:4px}.meta{font-size:11px;color:#999;margin-bottom:20px}table{width:100%;border-collapse:collapse}thead th{background:#006a4e;color:white;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px}tbody td{padding:10px 14px;border-bottom:1px solid #e5e7eb;font-size:12px}tbody tr:nth-child(even){background:#f9fafb}.code-cell{font-family:'Courier New',monospace;font-size:16px;font-weight:bold;color:#006a4e;letter-spacing:4px;background:#f0fdf4;padding:6px 10px;border-radius:6px;display:inline-block;border:1px dashed #006a4e}.footer{margin-top:30px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:10px;color:#999;text-align:center}.warning{background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:11px;color:#92400e}@media print{body{padding:15px}.no-print{display:none}}</style></head><body><div class="header"><h1>Kode Absensi Kegiatan</h1><h2>${kegiatanTitle}</h2></div><p class="meta">Tanggal cetak: ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} | Total: ${codes.length} peserta</p><div class="warning">RAHASIA - Setiap kode bersifat unik per individu.</div><table><thead><tr><th>No</th><th>Nama</th><th>NPM</th><th>Divisi</th><th>Kode Absensi</th></tr></thead><tbody>${codes.map((c,i)=>`<tr><td>${i+1}</td><td><strong>${c.name}</strong></td><td>${c.npm}</td><td>${c.divisi}</td><td><span class="code-cell">${c.code}</span></td></tr>`).join('')}</tbody></table><div class="footer">HIMA Informatika - Universitas Teknokrat Indonesia</div><div class="no-print" style="text-align:center;margin-top:20px"><button onclick="window.print()" style="padding:10px 24px;background:#006a4e;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer">Cetak / Simpan PDF</button></div><script>window.onload=function(){setTimeout(function(){window.print()},800)};<\/script></body></html>`;
     const blob = new Blob([htmlContent], { type: 'text/html' });
     window.open(URL.createObjectURL(blob), '_blank');
   };
@@ -110,10 +110,10 @@ const AdminDashboard = () => {
 
   const kegKategoriTabs = [
     { key: 'semua', label: 'Semua', count: kegiatan.length },
-    { key: 'materi-soal', label: '📝 Materi & Soal', count: kegiatan.filter(k=>k.kategori==='materi-soal').length },
-    { key: 'kajian', label: '📖 Kajian', count: kegiatan.filter(k=>k.kategori==='kajian').length },
+    { key: 'rapat', label: '📅 Rapat', count: kegiatan.filter(k=>k.kategori==='rapat').length },
+    { key: 'progja', label: '🚀 Program Kerja', count: kegiatan.filter(k=>k.kategori==='progja').length },
+    { key: 'panitia', label: '🎪 Kepanitiaan', count: kegiatan.filter(k=>k.kategori==='panitia').length },
     { key: 'seminar', label: '🎤 Seminar', count: kegiatan.filter(k=>k.kategori==='seminar').length },
-    { key: 'lomba', label: '🏆 Lomba', count: kegiatan.filter(k=>k.kategori==='lomba').length },
     { key: 'arsip', label: '📁 Arsip & Dokumen', count: kegiatan.filter(k=>k.kategori==='arsip').length },
   ];
 
@@ -126,13 +126,13 @@ const AdminDashboard = () => {
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <img src="/logo.jpeg" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
-            <div><div className="font-bold text-gray-900 text-sm">KSEI RIIEF</div><div className="text-[10px] text-gray-400">Admin Panel</div></div>
+            <div><div className="font-bold text-gray-900 text-sm">HIMA INFO</div><div className="text-[10px] text-gray-400">Admin Panel</div></div>
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           <button onClick={() => { setTab('users'); setSearch(''); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${tab === 'users' ? 'bg-hijau/10 text-hijau' : 'text-gray-500 hover:bg-gray-50'}`}>👥 Pengguna</button>
           <button onClick={() => { setTab('kegiatan'); setSearch(''); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${tab === 'kegiatan' ? 'bg-hijau/10 text-hijau' : 'text-gray-500 hover:bg-gray-50'}`}>📋 Kegiatan</button>
-          <button onClick={() => { setTab('keaktifan'); setSearch(''); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${tab === 'keaktifan' ? 'bg-hijau/10 text-hijau' : 'text-gray-500 hover:bg-gray-50'}`}>⭐ Keaktifan</button>
+          <button onClick={() => { setTab('keaktifan'); setSearch(''); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${tab === 'keaktifan' ? 'bg-hijau/10 text-hijau' : 'text-gray-500 hover:bg-gray-50'}`}>⭐ HIMA Score</button>
           <button onClick={() => { setTab('pendaftaran'); setSearch(''); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${tab === 'pendaftaran' ? 'bg-hijau/10 text-hijau' : 'text-gray-500 hover:bg-gray-50'}`}>📝 Pendaftaran</button>
           <button onClick={() => { setTab('feedback'); setSearch(''); }} className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium ${tab === 'feedback' ? 'bg-hijau/10 text-hijau' : 'text-gray-500 hover:bg-gray-50'}`}>💬 Kritik & Saran</button>
         </nav>
@@ -162,11 +162,11 @@ const AdminDashboard = () => {
           {success && <div className="p-3 rounded-xl bg-green-50 border border-green-100 text-sm text-green-700 mb-4">✅ {success}</div>}
 
           {/* Stats - only for users/kegiatan/keaktifan */}
-          {(tab === 'users' || tab === 'kegiatan' || tab === 'keaktifan') && (<>
+          {(tab === 'users' || tab === 'kegiatan') && (<>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
             <div className="bg-white rounded-xl p-4 border border-gray-100"><div className="text-2xl font-bold text-gray-900">{users.length}</div><div className="text-xs text-gray-400">Pengguna</div></div>
             <div className="bg-white rounded-xl p-4 border border-gray-100"><div className="text-2xl font-bold text-gray-900">{kegiatan.length}</div><div className="text-xs text-gray-400">Kegiatan</div></div>
-            <div className="bg-white rounded-xl p-4 border border-gray-100"><div className="text-2xl font-bold text-gray-900">{kegiatan.filter(k=>k.kategori==='materi-soal').length}</div><div className="text-xs text-gray-400">Materi/Soal</div></div>
+            <div className="bg-white rounded-xl p-4 border border-gray-100"><div className="text-2xl font-bold text-gray-900">{data.scoreAssessments.length}</div><div className="text-xs text-gray-400">Penilaian</div></div>
             <div className="bg-white rounded-xl p-4 border border-gray-100"><div className="text-2xl font-bold text-gray-900">{kegiatan.filter(k=>k.status==='open').length}</div><div className="text-xs text-gray-400">Aktif</div></div>
           </div>
 
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
                           <td className="px-4 py-3 font-medium text-gray-900">{u.name}</td>
                           <td className="px-4 py-3 text-gray-500">{u.npm}</td>
                           <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">{u.divisi || '-'}</td>
-                          <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs font-semibold ${u.role === 'admin' ? 'bg-kuning/20 text-kuning' : 'bg-hijau/10 text-hijau'}`}>{u.role}</span></td>
+                          <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs font-semibold ${u.role === 'admin' ? 'bg-red-100 text-red-700' : u.role === 'kadiv' ? 'bg-blue-100 text-blue-700' : 'bg-hijau/10 text-hijau'}`}>{u.role}</span></td>
                           <td className="px-4 py-3 flex items-center gap-2">
                             <button onClick={() => onEditUser(u)} className="text-blue-500 hover:text-blue-700 text-xs font-medium">✏️ Edit</button>
                             <button onClick={() => onDeleteUser(u.id, u.name)} className="text-gray-400 hover:text-red-500 text-sm">🗑️</button>
@@ -240,13 +240,13 @@ const AdminDashboard = () => {
                             <td className="px-4 py-3 font-medium text-gray-900 max-w-[200px] truncate">{k.title}</td>
                             <td className="px-4 py-3">
                               <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                k.kategori === 'materi-soal' ? 'bg-blue-50 text-blue-600' :
-                                k.kategori === 'kajian' ? 'bg-purple-50 text-purple-600' :
-                                k.kategori === 'seminar' ? 'bg-orange-50 text-orange-600' :
-                                k.kategori === 'arsip' ? 'bg-teal-50 text-teal-600' :
-                                'bg-yellow-50 text-yellow-700'
+                                k.kategori === 'rapat' ? 'bg-purple-50 text-purple-600' :
+                                k.kategori === 'progja' ? 'bg-blue-50 text-blue-600' :
+                                k.kategori === 'panitia' ? 'bg-orange-50 text-orange-600' :
+                                k.kategori === 'seminar' ? 'bg-pink-50 text-pink-600' :
+                                'bg-teal-50 text-teal-600'
                               }`}>
-                                {k.kategori === 'materi-soal' ? '📝 Materi & Soal' : k.kategori === 'kajian' ? '📖 Kajian' : k.kategori === 'seminar' ? '🎤 Seminar' : k.kategori === 'arsip' ? '📁 Arsip' : '🏆 Lomba'}
+                                {k.kategori === 'rapat' ? '📅 Rapat' : k.kategori === 'progja' ? '🚀 Progja' : k.kategori === 'panitia' ? '🎪 Panitia' : k.kategori === 'seminar' ? '🎤 Seminar' : '📁 Arsip'}
                               </span>
                             </td>
                             <td className="px-4 py-3 hidden sm:table-cell">
@@ -263,15 +263,8 @@ const AdminDashboard = () => {
                             </td>
                             <td className="px-4 py-3 flex items-center gap-2 flex-wrap">
                               <button onClick={() => onEditKeg(k)} className="text-blue-500 hover:text-blue-700 text-xs font-medium">✏️ Edit</button>
-                              {k.kategori === 'materi-soal' && k.questions?.length > 0 && (
-                                <button onClick={() => viewSubmissions(k.id)} className="text-purple-500 hover:text-purple-700 text-xs font-medium">📊 Hasil</button>
-                              )}
-                              {k.kategori !== 'materi-soal' && (
-                                <>
-                                  <button onClick={() => downloadPDF(k.id)} className="text-green-600 hover:text-green-800 text-xs font-medium">📄 Kode</button>
-                                  <button onClick={() => viewAttendance(k.id)} className="text-purple-500 hover:text-purple-700 text-xs font-medium">📋 Absen</button>
-                                </>
-                              )}
+                              <button onClick={() => downloadPDF(k.id)} className="text-green-600 hover:text-green-800 text-xs font-medium">📄 Kode</button>
+                              <button onClick={() => viewAttendance(k.id)} className="text-purple-500 hover:text-purple-700 text-xs font-medium">📋 Absen</button>
                               <button onClick={() => onDeleteKeg(k.id, k.title)} className="text-gray-400 hover:text-red-500 text-sm">🗑️</button>
                             </td>
                           </tr>
@@ -284,149 +277,8 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* === KEAKTIFAN SECTION === */}
-          {tab === 'keaktifan' && (() => {
-            const allSubs = data.submissions;
-            const allAtts = data.attendance;
-            const members = users.filter(u => u.role !== 'admin');
-
-            // Calculate engagement data per member
-            const memberData = members.map(m => {
-              const mySubs = allSubs.filter(s => s.userId === m.id);
-              const myAtts = allAtts.filter(a => a.userId === m.id);
-
-              // Points: Quiz = 15pts each, Attendance = 10pts each
-              const quizPoints = mySubs.length * 15;
-              const absenPoints = myAtts.length * 10;
-              const totalPoints = quizPoints + absenPoints;
-
-              // Get kegiatan names
-              const activities = [
-                ...mySubs.map(s => {
-                  const keg = kegiatan.find(k => k.id === s.kegiatanId);
-                  return { type: 'quiz', title: keg?.title || 'Kegiatan', score: s.score, date: s.submittedAt, points: 15 };
-                }),
-                ...myAtts.map(a => {
-                  const keg = kegiatan.find(k => k.id === a.kegiatanId);
-                  return { type: 'absen', title: keg?.title || 'Kegiatan', date: a.timestamp, points: 10 };
-                }),
-              ].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-              return { ...m, quizCount: mySubs.length, absenCount: myAtts.length, quizPoints, absenPoints, totalPoints, activities };
-            }).sort((a, b) => b.totalPoints - a.totalPoints);
-
-            const getRank = (pts) => {
-              if (pts >= 100) return { label: 'Sangat Aktif', color: 'text-green-600 bg-green-50', icon: '🏆' };
-              if (pts >= 60) return { label: 'Aktif', color: 'text-blue-600 bg-blue-50', icon: '⭐' };
-              if (pts >= 30) return { label: 'Cukup Aktif', color: 'text-kuning bg-kuning/10', icon: '📊' };
-              return { label: 'Kurang Aktif', color: 'text-red-500 bg-red-50', icon: '⚠️' };
-            };
-
-            const filteredMembers = memberData.filter(m =>
-              m.name?.toLowerCase().includes(search.toLowerCase()) || m.npm?.includes(search)
-            );
-
-            return (
-              <div>
-                {/* Summary cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="text-2xl font-bold text-gray-900">{members.length}</div>
-                    <div className="text-xs text-gray-400">Total Member</div>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="text-2xl font-bold text-green-600">{memberData.filter(m => m.totalPoints >= 60).length}</div>
-                    <div className="text-xs text-gray-400">Member Aktif</div>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="text-2xl font-bold text-gray-900">{allSubs.length}</div>
-                    <div className="text-xs text-gray-400">Total Quiz</div>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <div className="text-2xl font-bold text-gray-900">{allAtts.length}</div>
-                    <div className="text-xs text-gray-400">Total Absensi</div>
-                  </div>
-                </div>
-
-                {/* Search */}
-                <div className="mb-4">
-                  <input type="text" placeholder="Cari member..." value={search} onChange={e => setSearch(e.target.value)}
-                    className="w-full sm:max-w-xs px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-hijau/20" />
-                </div>
-
-                {/* Point system info */}
-                <div className="flex flex-wrap gap-3 mb-4 text-xs text-gray-500">
-                  <span className="bg-white px-3 py-1.5 rounded-lg border border-gray-100">📝 Quiz = <strong>15 poin</strong></span>
-                  <span className="bg-white px-3 py-1.5 rounded-lg border border-gray-100">📋 Absensi = <strong>10 poin</strong></span>
-                  <span className="bg-green-50 px-3 py-1.5 rounded-lg border border-green-100 text-green-700">🏆 ≥100 Sangat Aktif</span>
-                  <span className="bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 text-blue-600">⭐ ≥60 Aktif</span>
-                  <span className="bg-kuning/10 px-3 py-1.5 rounded-lg border border-kuning/20 text-kuning">📊 ≥30 Cukup</span>
-                </div>
-
-                {/* Member ranking table */}
-                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                  {filteredMembers.length === 0 ? (
-                    <div className="p-10 text-center text-gray-400 text-sm">
-                      {members.length === 0 ? 'Belum ada member. Tambahkan pengguna terlebih dahulu.' : 'Tidak ditemukan'}
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-sm">
-                        <thead><tr className="bg-gray-50 text-gray-400 text-xs uppercase">
-                          <th className="px-4 py-2.5 w-10">#</th>
-                          <th className="px-4 py-2.5">Nama</th>
-                          <th className="px-4 py-2.5">NPM</th>
-                          <th className="px-4 py-2.5 hidden sm:table-cell">Divisi</th>
-                          <th className="px-4 py-2.5 text-center">Quiz</th>
-                          <th className="px-4 py-2.5 text-center">Absen</th>
-                          <th className="px-4 py-2.5 text-center">Poin</th>
-                          <th className="px-4 py-2.5">Status</th>
-                          <th className="px-4 py-2.5">Detail</th>
-                        </tr></thead>
-                        <tbody className="divide-y divide-gray-50">
-                          {filteredMembers.map((m, idx) => {
-                            const rank = getRank(m.totalPoints);
-                            return (
-                              <tr key={m.id} className="hover:bg-gray-50/50">
-                                <td className="px-4 py-3">
-                                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                    idx === 0 ? 'bg-kuning/20 text-kuning' : idx === 1 ? 'bg-gray-200 text-gray-600' : idx === 2 ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-gray-400'
-                                  }`}>{idx + 1}</span>
-                                </td>
-                                <td className="px-4 py-3 font-medium text-gray-900">{m.name}</td>
-                                <td className="px-4 py-3 text-gray-500">{m.npm}</td>
-                                <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">{m.divisi || '-'}</td>
-                                <td className="px-4 py-3 text-center">
-                                  <span className="text-blue-600 font-medium">{m.quizCount}</span>
-                                </td>
-                                <td className="px-4 py-3 text-center">
-                                  <span className="text-purple-600 font-medium">{m.absenCount}</span>
-                                </td>
-                                <td className="px-4 py-3 text-center">
-                                  <span className="text-lg font-bold text-gray-900">{m.totalPoints}</span>
-                                </td>
-                                <td className="px-4 py-3">
-                                  <span className={`px-2 py-0.5 rounded text-xs font-semibold ${rank.color}`}>
-                                    {rank.icon} {rank.label}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-3">
-                                  <button onClick={() => { setSelectedMember(m); setModal('member-detail'); }}
-                                    className="text-hijau hover:text-hijau-tua text-xs font-medium">
-                                    📋 Lihat
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
+          {/* === KEAKTIFAN / SCORING SECTION === */}
+          {tab === 'keaktifan' && <ScoringPanel />}
 
           {/* === TAB: PENDAFTARAN === */}
           {tab === 'pendaftaran' && (
@@ -488,7 +340,7 @@ const AdminDashboard = () => {
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Divisi</label>
                   <select value={userForm.divisi} onChange={e=>setUserForm({...userForm,divisi:e.target.value})} className={inp}><option value="">Pilih</option>{divisiList.map(d=><option key={d} value={d}>{d}</option>)}</select></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <select value={userForm.role} onChange={e=>setUserForm({...userForm,role:e.target.value})} className={inp}><option value="member">Member</option><option value="admin">Admin</option></select></div>
+                  <select value={userForm.role} onChange={e=>setUserForm({...userForm,role:e.target.value})} className={inp}><option value="member">Member</option><option value="kadiv">Kadiv (Kepala Divisi)</option><option value="admin">Admin</option></select></div>
                 <button type="submit" className="w-full py-2.5 bg-hijau text-white font-semibold rounded-xl hover:bg-hijau-tua text-sm">{editId ? 'Simpan Perubahan' : 'Buat Akun'}</button>
               </form>
             )}
@@ -498,62 +350,29 @@ const AdminDashboard = () => {
               <form onSubmit={onSaveKeg} className="space-y-3">
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
                   <select value={kegForm.kategori} onChange={e=>setKegForm({...kegForm,kategori:e.target.value})} className={inp}>
-                    <option value="materi-soal">📝 Materi & Soal</option><option value="kajian">📖 Kajian</option>
-                    <option value="seminar">🎤 Seminar</option><option value="lomba">🏆 Lomba</option><option value="arsip">Arsip & Dokumen</option>
+                    <option value="rapat">📅 Rapat</option><option value="progja">🚀 Program Kerja</option>
+                    <option value="panitia">🎪 Kepanitiaan</option><option value="seminar">🎤 Seminar</option><option value="arsip">📁 Arsip & Dokumen</option>
                   </select></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Judul</label><input type="text" value={kegForm.title} onChange={e=>setKegForm({...kegForm,title:e.target.value})} className={inp} required /></div>
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label><textarea value={kegForm.description} onChange={e=>setKegForm({...kegForm,description:e.target.value})} className={inp} rows={2} /></div>
 
-                {kegForm.kategori === 'materi-soal' && (
-                  <>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
-                      <select value={kegForm.type} onChange={e=>setKegForm({...kegForm,type:e.target.value})} className={inp}>
-                        <option value="soal">Soal (Ada Quiz)</option><option value="materi">Materi Saja</option>
-                      </select></div>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-1">Konten Materi</label>
-                      <textarea value={kegForm.materiContent} onChange={e=>setKegForm({...kegForm,materiContent:e.target.value})} className={inp} rows={3} placeholder="Tulis materi..." /></div>
-                    {kegForm.type === 'soal' && (
-                      <div className="border border-gray-200 rounded-xl p-4">
-                        <h4 className="font-semibold text-sm text-gray-900 mb-3">📋 Soal ({kegForm.questions.length})</h4>
-                        {kegForm.questions.map((q,i) => (
-                          <div key={i} className="flex items-center justify-between bg-gray-50 rounded-lg p-2 mb-2 text-sm">
-                            <span className="truncate flex-1 text-gray-700">{i+1}. {q.question}</span>
-                            <button type="button" onClick={() => removeQuestion(i)} className="text-red-400 hover:text-red-600 ml-2">✕</button>
-                          </div>
-                        ))}
-                        <div className="mt-3 space-y-2 border-t border-gray-100 pt-3">
-                          <select value={qForm.type} onChange={e=>setQForm({...qForm,type:e.target.value})} className={inp}>
-                            <option value="pilihan_ganda">Pilihan Ganda</option><option value="essay">Essay</option>
-                          </select>
-                          <input type="text" value={qForm.question} onChange={e=>setQForm({...qForm,question:e.target.value})} className={inp} placeholder="Pertanyaan" />
-                          {qForm.type === 'pilihan_ganda' && (
-                            <>
-                              {qForm.options.map((o,i) => (
-                                <input key={i} type="text" value={o} onChange={e => { const opts=[...qForm.options]; opts[i]=e.target.value; setQForm({...qForm,options:opts}); }}
-                                  className={inp} placeholder={`Opsi ${['A','B','C','D'][i]}`} />
-                              ))}
-                              <select value={qForm.correctAnswer} onChange={e=>setQForm({...qForm,correctAnswer:parseInt(e.target.value)})} className={inp}>
-                                {['A','B','C','D'].map((l,i) => <option key={i} value={i}>Jawaban Benar: {l}</option>)}
-                              </select>
-                            </>
-                          )}
-                          <input type="number" value={qForm.points} onChange={e=>setQForm({...qForm,points:parseInt(e.target.value)||0})} className={inp} placeholder="Poin" />
-                          <button type="button" onClick={addQuestion} className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">+ Tambah Soal</button>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                {(kegForm.kategori === 'progja' || kegForm.kategori === 'panitia') && (
+                  <div><label className="block text-sm font-medium text-gray-700 mb-1">Divisi</label>
+                    <select value={kegForm.divisi||''} onChange={e=>setKegForm({...kegForm,divisi:e.target.value})} className={inp}>
+                      <option value="">Semua Divisi / Umum</option>
+                      <option value="Hubungan Masyarakat">Hubungan Masyarakat</option>
+                      <option value="Sosial Masyarakat">Sosial Masyarakat</option>
+                      <option value="Sumber Daya Manusia">Sumber Daya Manusia</option>
+                      <option value="Bina Prestasi">Bina Prestasi</option>
+                      <option value="Komdigi">Komdigi</option>
+                      <option value="Ekonomi Kreatif">Ekonomi Kreatif</option>
+                    </select></div>
                 )}
 
-                {kegForm.kategori !== 'materi-soal' && (
-                  <>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-1">Jadwal</label><input type="text" value={kegForm.jadwal||''} onChange={e=>setKegForm({...kegForm,jadwal:e.target.value})} className={inp} placeholder="Contoh: Setiap Jumat, 13:00 WIB" /></div>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-1">Tempat</label><input type="text" value={kegForm.tempat||''} onChange={e=>setKegForm({...kegForm,tempat:e.target.value})} className={inp} /></div>
-                    <div><label className="block text-sm font-medium text-gray-700 mb-1">Pemateri</label><input type="text" value={kegForm.pemateri||''} onChange={e=>setKegForm({...kegForm,pemateri:e.target.value})} className={inp} /></div>
-                    {kegForm.kategori === 'lomba' && <div><label className="block text-sm font-medium text-gray-700 mb-1">Hadiah</label><input type="text" value={kegForm.hadiah||''} onChange={e=>setKegForm({...kegForm,hadiah:e.target.value})} className={inp} /></div>}
-                    {kegForm.kategori === 'arsip' && <div><label className="block text-sm font-medium text-gray-700 mb-1">🔗 Link Dokumen (URL)</label><input type="url" value={kegForm.linkUrl||''} onChange={e=>setKegForm({...kegForm,linkUrl:e.target.value})} className={inp} placeholder="https://docs.google.com/..." /><p className="text-[10px] text-gray-400 mt-1">Link ke Google Forms, PDF, Excel, atau dokumen lainnya</p></div>}
-                  </>
-                )}
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Jadwal</label><input type="text" value={kegForm.jadwal||''} onChange={e=>setKegForm({...kegForm,jadwal:e.target.value})} className={inp} placeholder="Contoh: Setiap Jumat, 13:00 WIB" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Tempat</label><input type="text" value={kegForm.tempat||''} onChange={e=>setKegForm({...kegForm,tempat:e.target.value})} className={inp} /></div>
+                {kegForm.kategori === 'seminar' && <div><label className="block text-sm font-medium text-gray-700 mb-1">Pemateri</label><input type="text" value={kegForm.pemateri||''} onChange={e=>setKegForm({...kegForm,pemateri:e.target.value})} className={inp} /></div>}
+                {kegForm.kategori === 'arsip' && <div><label className="block text-sm font-medium text-gray-700 mb-1">🔗 Link Dokumen (URL)</label><input type="url" value={kegForm.linkUrl||''} onChange={e=>setKegForm({...kegForm,linkUrl:e.target.value})} className={inp} placeholder="https://docs.google.com/..." /><p className="text-[10px] text-gray-400 mt-1">Link ke Google Forms, PDF, Excel, atau dokumen lainnya</p></div>}
 
                 {/* Tanggal & Jam Buka/Tutup */}
                 <div className="border border-dashed border-gray-200 rounded-xl p-4 bg-gray-50/50">
@@ -624,7 +443,7 @@ const AdminDashboard = () => {
               const getRankDetail = (pts) => {
                 if (pts >= 100) return { label: 'Sangat Aktif', color: 'text-green-600 bg-green-50', icon: '🏆' };
                 if (pts >= 60) return { label: 'Aktif', color: 'text-blue-600 bg-blue-50', icon: '⭐' };
-                if (pts >= 30) return { label: 'Cukup Aktif', color: 'text-kuning bg-kuning/10', icon: '📊' };
+                if (pts >= 30) return { label: 'Cukup Aktif', color: 'text-amber-600 bg-amber-50', icon: '📊' };
                 return { label: 'Kurang Aktif', color: 'text-red-500 bg-red-50', icon: '⚠️' };
               };
               const rank = getRankDetail(selectedMember.totalPoints);

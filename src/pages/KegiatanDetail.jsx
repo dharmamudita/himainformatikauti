@@ -143,7 +143,7 @@ const KegiatanDetail = () => {
                   </div>
                 )}
                 {kegiatan.hadiah && (
-                  <div className="p-4 rounded-xl bg-kuning/10 border border-kuning/20 sm:col-span-2">
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 sm:col-span-2">
                     <div className="text-xs text-kuning mb-0.5">🏆 Hadiah</div>
                     <div className="text-sm font-semibold text-gray-900">{kegiatan.hadiah}</div>
                   </div>
