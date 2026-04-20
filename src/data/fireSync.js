@@ -1,4 +1,4 @@
-// ===== FIREBASE SYNC LAYER =====
+﻿// ===== FIREBASE SYNC LAYER =====
 // Sinkronisasi data antara localStorage (cache) dan Firestore (cloud)
 // Pattern: Write-through cache
 // - Read: dari localStorage (cepat, synchronous)
@@ -10,13 +10,13 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Nama dokumen di Firestore per collection
 const COLLECTIONS = {
-  ksei_users: 'users',
-  ksei_kegiatan: 'kegiatan',
-  ksei_submissions: 'submissions',
-  ksei_attendance: 'attendance',
-  ksei_forum: 'forum',
-  ksei_registrations: 'registrations',
-  ksei_feedback: 'feedback',
+  HIMA_users: 'users',
+  HIMA_kegiatan: 'kegiatan',
+  HIMA_submissions: 'submissions',
+  HIMA_attendance: 'attendance',
+  HIMA_forum: 'forum',
+  HIMA_registrations: 'registrations',
+  HIMA_feedback: 'feedback',
 };
 
 // --- Push ke Firestore (async, fire-and-forget) ---

@@ -1,15 +1,15 @@
-// ===== DATABASE: ATTENDANCE MANAGEMENT =====
+﻿// ===== DATABASE: ATTENDANCE MANAGEMENT =====
 // Menyimpan dan mengelola data absensi kegiatan (kajian, seminar, lomba)
 
 import { getUsers } from './users';
 import { saveAndSync } from './fireSync';
 
-const STORAGE_KEY = 'ksei_attendance';
+const STORAGE_KEY = 'HIMA_attendance';
 
 // --- Kode Generator ---
 // Menghasilkan kode unik 6 karakter per user per kegiatan
 export const generateAttendanceCode = (userId, kegiatanId) => {
-  const str = `${userId}-${kegiatanId}-ksei2024`;
+  const str = `${userId}-${kegiatanId}-hima2024`;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
@@ -154,7 +154,7 @@ export const downloadAttendancePDF = (kegiatanId, kegiatanTitle) => {
   </table>
 
   <div class="footer">
-    UKM KSEI RIIEF — UIN Raden Intan Lampung<br>
+    UKM HIMA Informatika — Universitas Teknokrat Indonesia<br>
     Dokumen ini digenerate otomatis dan bersifat rahasia
   </div>
 

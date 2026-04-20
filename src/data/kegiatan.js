@@ -1,11 +1,11 @@
-// ===== DATABASE: KEGIATAN MANAGEMENT =====
+﻿// ===== DATABASE: KEGIATAN MANAGEMENT =====
 // Menyimpan dan mengelola data kegiatan (materi-soal, kajian, seminar, lomba)
 
 import { getSubmissions, saveSubmissions } from './submissions';
 import { getAttendance, saveAttendance } from './attendance';
 import { saveAndSync } from './fireSync';
 
-const STORAGE_KEY = 'ksei_kegiatan';
+const STORAGE_KEY = 'HIMA_kegiatan';
 
 // --- Auto status berdasarkan tanggal & jam ---
 export const computeStatus = (k) => {

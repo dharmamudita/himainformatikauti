@@ -1,11 +1,11 @@
-import { saveAndSync } from './fireSync';
+﻿import { saveAndSync } from './fireSync';
 
-const STORAGE_KEY = 'ksei_users';
-const SESSION_KEY = 'ksei_current_user';
+const STORAGE_KEY = 'HIMA_users';
+const SESSION_KEY = 'HIMA_current_user';
 
 export const defaultAdmin = {
   id: 'admin-001',
-  name: 'Admin RIIEF',
+  name: 'Admin Informatika',
   npm: 'admin',
   password: 'admin123',
   role: 'admin',

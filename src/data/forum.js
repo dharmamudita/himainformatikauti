@@ -1,6 +1,6 @@
-import { saveAndSync } from './fireSync';
+﻿import { saveAndSync } from './fireSync';
 
-const STORAGE_KEY = 'ksei_forum';
+const STORAGE_KEY = 'HIMA_forum';
 
 // --- Read ---
 export const getTopics = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');

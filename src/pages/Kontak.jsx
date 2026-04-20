@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 
 const inp = 'w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-hijau/20 focus:border-hijau text-sm';
@@ -30,7 +30,7 @@ const Kontak = () => {
       <section className="bg-hijau pt-24 pb-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Pendaftaran <span className="text-kuning">Anggota</span></h1>
-          <p className="text-white/50 text-sm">Bergabung menjadi bagian dari KSEI RIIEF</p>
+          <p className="text-white/50 text-sm">Bergabung menjadi bagian dari HIMA Informatika</p>
         </div>
       </section>
 
@@ -38,7 +38,7 @@ const Kontak = () => {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Gabung <span className="text-hijau">KSEI RIIEF</span></h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Gabung <span className="text-hijau">HIMA Informatika</span></h2>
               <p className="text-gray-400 text-sm mb-6">Lengkapi formulir pendaftaran di bawah ini.</p>
               <div className="space-y-3">
                 {[
@@ -58,8 +58,8 @@ const Kontak = () => {
               <div className="mt-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
                 <div className="font-semibold text-gray-900 text-sm mb-2">📍 Kontak Kami</div>
                 <div className="text-gray-500 text-xs space-y-1">
-                  <p>Kampus UIN Raden Intan Lampung, Jl. Letkol H. Endro Suratmin, Bandar Lampung</p>
-                  <p>📧 kseiriief@radenintan.ac.id</p>
+                  <p>Kampus Universitas Teknokrat Indonesia, Jl. Letkol H. Endro Suratmin, Bandar Lampung</p>
+                  <p>📧 HIMAInformatika@radenintan.ac.id</p>
                 </div>
               </div>
             </div>

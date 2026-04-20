@@ -17,7 +17,13 @@ const Login = () => {
     setLoading(true);
     setTimeout(() => {
       const r = login(npm, password);
-      if (r.success) navigate('/');
+      if (r.success) {
+        // Redirect by role
+        const u = r.user;
+        if (u?.role === 'admin') navigate('/admin');
+        else if (u?.role === 'kadiv') navigate('/kadiv');
+        else navigate('/dashboard');
+      }
       else setError(r.error);
       setLoading(false);
     }, 400);
@@ -31,7 +37,7 @@ const Login = () => {
             <div className="w-12 h-12 mx-auto rounded-xl bg-white/10 text-white font-bold text-lg flex items-center justify-center mb-3 border border-white/20">R</div>
           </Link>
           <h1 className="text-xl font-bold text-white mb-1">Selamat Datang</h1>
-          <p className="text-white/50 text-sm">Masuk ke akun KSEI RIIEF Anda</p>
+          <p className="text-white/50 text-sm">Masuk ke akun HIMA Informatika Anda</p>
         </div>
 
         <div className="bg-white rounded-2xl p-6 shadow-lg">

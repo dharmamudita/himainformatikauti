@@ -1,6 +1,6 @@
-import { saveAndSync } from './fireSync';
+﻿import { saveAndSync } from './fireSync';
 
-const STORAGE_KEY = 'ksei_feedback';
+const STORAGE_KEY = 'HIMA_feedback';
 
 // --- Read ---
 export const getFeedback = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');

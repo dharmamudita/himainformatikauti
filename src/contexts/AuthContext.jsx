@@ -11,17 +11,18 @@ export const AuthProvider = ({ children }) => {
 
   const login = (npm, password) => {
     const u = loginUser(npm, password);
-    if (u) { setUser(u); return { success: true }; }
+    if (u) { setUser(u); return { success: true, user: u }; }
     return { success: false, error: 'NPM atau Password salah' };
   };
 
   const logout = () => { setUser(null); };
   const isAdmin = user?.role === 'admin';
+  const isKadiv = user?.role === 'kadiv';
 
   if (loading) return null;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isKadiv }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { Link } from 'react-router-dom';
@@ -72,7 +72,7 @@ const Forum = () => {
       <section className="bg-hijau pt-24 pb-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">💬 Forum <span className="text-kuning">Diskusi</span></h1>
-          <p className="text-white/50 text-sm">Ruang diskusi antar anggota KSEI RIIEF</p>
+          <p className="text-white/50 text-sm">Ruang diskusi antar anggota HIMA Informatika</p>
         </div>
       </section>
 

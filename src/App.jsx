@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import Leaderboard from './pages/Leaderboard';
 import MemberDashboard from './pages/MemberDashboard';
+import KadivDashboard from './pages/KadivDashboard';
 import Forum from './pages/Forum';
 
 const ScrollToTop = () => {
@@ -26,7 +27,7 @@ const ScrollToTop = () => {
 
 const Layout = ({ children }) => {
   const { pathname } = useLocation();
-  const hide = pathname === '/login' || pathname === '/admin';
+  const hide = pathname === '/login' || pathname === '/admin' || pathname === '/kadiv';
   return (
     <>
       {!hide && <Navbar />}
@@ -56,6 +57,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={<ProtectedRoute><MemberDashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/kadiv" element={<ProtectedRoute adminOnly kadivAllowed><KadivDashboard /></ProtectedRoute>} />
             </Routes>
           </Layout>
         </AuthProvider>
