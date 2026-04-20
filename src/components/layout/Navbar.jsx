@@ -6,7 +6,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scroll, setScroll] = useState(false);
   const [drop, setDrop] = useState(false);
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isKadiv } = useAuth();
   const loc = useLocation();
   const nav = useNavigate();
 
@@ -33,10 +33,10 @@ const Navbar = () => {
       <div className="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.jpeg" alt="KSEI RIIEF" className="w-9 h-9 rounded-lg object-cover" />
-          <div>
-            <div className={`font-bold text-sm ${scroll ? 'text-gray-900' : 'text-white'}`}>KSEI RIIEF</div>
-            <div className={`text-[9px] tracking-widest ${scroll ? 'text-gray-400' : 'text-white/60'}`}>UIN RADEN INTAN</div>
+          <img src="/logo-hima.png" alt="HIMA Informatika" className="w-9 h-9 rounded-lg object-contain" />
+          <div className="hidden sm:block">
+            <div className={`font-bold text-sm ${scroll ? 'text-gray-900' : 'text-white'}`}>HIMA Informatika</div>
+            <div className={`text-[9px] tracking-widest ${scroll ? 'text-gray-400' : 'text-white/60'}`}>UNIVERSITAS TEKNOKRAT INDONESIA</div>
           </div>
         </Link>
 
@@ -68,7 +68,9 @@ const Navbar = () => {
                     <div className="text-xs text-gray-400">{user.npm}</div>
                   </div>
                   {isAdmin && <Link to="/admin" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Dashboard Admin</Link>}
-                  {!isAdmin && <Link to="/dashboard" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Dashboard Saya</Link>}
+                  {isKadiv && <Link to="/kadiv" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Dashboard Kadiv</Link>}
+                  {!isAdmin && !isKadiv && <Link to="/dashboard" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Dashboard Saya</Link>}
+                  {(isAdmin || isKadiv) && <Link to="/dashboard" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Dashboard Saya</Link>}
                   <button onClick={() => { logout(); nav('/'); }} className="block w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50">Keluar</button>
                 </div>
               )}
@@ -99,7 +101,9 @@ const Navbar = () => {
             <div className="pt-2 border-t border-gray-100 mt-2">
               <div className="px-3 py-2 text-sm font-semibold text-gray-900">{user.name}</div>
               {isAdmin && <Link to="/admin" className="block px-3 py-2 text-sm text-hijau">Dashboard Admin</Link>}
-              {!isAdmin && <Link to="/dashboard" className="block px-3 py-2 text-sm text-hijau">Dashboard Saya</Link>}
+              {isKadiv && <Link to="/kadiv" className="block px-3 py-2 text-sm text-hijau">Dashboard Kadiv</Link>}
+              {!isAdmin && !isKadiv && <Link to="/dashboard" className="block px-3 py-2 text-sm text-hijau">Dashboard Saya</Link>}
+              {(isAdmin || isKadiv) && <Link to="/dashboard" className="block px-3 py-2 text-sm text-hijau">Dashboard Saya</Link>}
               <button onClick={() => { logout(); nav('/'); }} className="block w-full text-left px-3 py-2 text-sm text-red-500">Keluar</button>
             </div>
           ) : (

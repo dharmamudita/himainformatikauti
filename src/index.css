@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-hijau: #006a4e;
-  --color-hijau-tua: #004d38;
-  --color-hijau-muda: #00896a;
-  --color-kuning: #d4a843;
-  --color-kuning-muda: #e6c36a;
+  --color-hijau: #7b1114;
+  --color-hijau-tua: #5a0c0e;
+  --color-hijau-muda: #a11518;
+  --color-kuning: #ffffff;
+  --color-kuning-muda: #f0f0f0;
   --color-gelap: #111827;
   --color-abu: #6b7280;
   --font-family-sans: 'Plus Jakarta Sans', system-ui, sans-serif;

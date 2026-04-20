@@ -7,13 +7,12 @@ const Struktur = () => {
   ];
 
   const divisi = [
-    { name: 'Kaderisasi', desc: 'Pembinaan dan pengembangan kader organisasi', icon: '🎓' },
-    { name: 'Research & Development', desc: 'Riset dan pengembangan kajian ekonomi Islam', icon: '🔬' },
-    { name: 'Public Relation', desc: 'Hubungan masyarakat dan komunikasi eksternal', icon: '🤝' },
-    { name: 'Entrepreneurship', desc: 'Pengembangan kewirausahaan berbasis Islam', icon: '💡' },
-    { name: 'Kesekretariatan', desc: 'Administrasi dan dokumentasi organisasi', icon: '📋' },
-    { name: 'Kemuslimahan', desc: 'Pembinaan keislaman anggota', icon: '🕌' },
-    { name: 'Media & Komunikasi', desc: 'Pengelolaan media dan konten digital', icon: '📱' },
+    { name: 'Hubungan Masyarakat', desc: 'Hubungan masyarakat dan komunikasi eksternal', icon: '🤝' },
+    { name: 'Sosial Masyarakat', desc: 'Pengabdian dan kontribusi kepada masyarakat', icon: '🌍' },
+    { name: 'Sumber Daya Manusia', desc: 'Pengembangan kualitas dan kaderisasi anggota', icon: '🎓' },
+    { name: 'Bina Prestasi', desc: 'Pembinaan dan pengembangan prestasi mahasiswa', icon: '🏆' },
+    { name: 'Komdigi', desc: 'Komunikasi digital dan pengelolaan media sosial', icon: '📱' },
+    { name: 'Ekonomi Kreatif', desc: 'Pengembangan kreativitas dan kewirausahaan', icon: '💡' },
   ];
 
   return (
@@ -21,14 +20,14 @@ const Struktur = () => {
       <section className="bg-hijau pt-24 pb-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Struktur <span className="text-kuning">Organisasi</span></h1>
-          <p className="text-white/50 text-sm">Kepengurusan UKM KSEI RIIEF UIN Raden Intan Lampung</p>
+          <p className="text-white/50 text-sm">Kepengurusan HIMA Informatika Universitas Teknokrat Indonesia</p>
         </div>
       </section>
 
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Pengurus <span className="text-hijau">Inti</span></h2>
-          <p className="text-gray-400 text-sm text-center mb-10">Jajaran pengurus inti KSEI RIIEF</p>
+          <p className="text-gray-400 text-sm text-center mb-10">Jajaran pengurus inti HIMA Informatika</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {pengurus.map((p, i) => (
               <div key={i} className="text-center p-6 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
@@ -44,7 +43,7 @@ const Struktur = () => {
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Divisi <span className="text-hijau">Kami</span></h2>
-          <p className="text-gray-400 text-sm text-center mb-10">7 divisi yang bergerak aktif di KSEI RIIEF</p>
+          <p className="text-gray-400 text-sm text-center mb-10">6 divisi yang bergerak aktif di HIMA Informatika</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {divisi.map((d, i) => (
               <div key={i} className="p-5 rounded-xl bg-white border border-gray-100 hover:shadow-md transition-shadow">
