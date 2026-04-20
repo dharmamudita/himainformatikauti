@@ -1,6 +1,7 @@
 // ===== DATA CONTEXT =====
 // Semua data langsung dari Firestore (realtime), TANPA localStorage
 // Data otomatis sinkron di semua device
+// + Sistem Penilaian Keaktifan (HIMA Score)
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { db } from '../firebase/config';
@@ -8,6 +9,27 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
 const DataContext = createContext();
 export const useData = () => useContext(DataContext);
+
+// ===== SCORING SYSTEM =====
+// Bobot kategori penilaian
+const BOBOT = { rapat: 0.20, progja: 0.45, panitia: 0.35 };
+
+// Hitung skor anggota berdasarkan assessments
+function hitungSkor(memberAssessments, skorAwal) {
+  const grouped = { rapat: [], progja: [], panitia: [] };
+  memberAssessments.forEach(a => {
+    if (grouped[a.kategori]) grouped[a.kategori].push(a.nilai);
+  });
+  const avg = {};
+  for (const kat of Object.keys(BOBOT)) {
+    if (grouped[kat].length > 0) {
+      avg[kat] = grouped[kat].reduce((s, v) => s + v, 0) / grouped[kat].length;
+    } else {
+      avg[kat] = skorAwal; // Safety net
+    }
+  }
+  return (avg.rapat * BOBOT.rapat) + (avg.progja * BOBOT.progja) + (avg.panitia * BOBOT.panitia);
+}
 
 // Helper: compute status kegiatan berdasarkan tanggal
 const computeStatus = (k) => {
@@ -22,7 +44,7 @@ const computeStatus = (k) => {
 
 // Helper: generate attendance code
 const generateAttendanceCode = (userId, kegiatanId) => {
-  const str = `${userId}-${kegiatanId}-ksei2024`;
+  const str = `${userId}-${kegiatanId}-hima2024`;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
@@ -40,7 +62,7 @@ const generateAttendanceCode = (userId, kegiatanId) => {
 // Default admin
 const defaultAdmin = {
   id: 'admin-001',
-  name: 'Admin RIIEF',
+  name: 'Admin HIMA',
   npm: 'admin',
   password: 'admin123',
   role: 'admin',
@@ -58,6 +80,7 @@ const DOCS = {
   registrations: doc(db, 'appData', 'registrations'),
   feedback: doc(db, 'appData', 'feedback'),
   regSettings: doc(db, 'appData', 'regSettings'),
+  scoreAssessments: doc(db, 'appData', 'scoreAssessments'),
 };
 
 // Save to Firestore
@@ -78,9 +101,9 @@ export const DataProvider = ({ children }) => {
   const [registrations, setRegistrations] = useState([]);
   const [feedback, setFeedback] = useState([]);
   const [regSettings, setRegSettings] = useState({ isOpen: true, waNumber: '6281234567890' });
+  const [scoreAssessments, setScoreAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Refs untuk akses data terbaru di dalam callbacks (menghindari stale closure)
   const usersRef = useRef(users);
   const kegiatanRef = useRef(kegiatan);
   const submissionsRef = useRef(submissions);
@@ -89,8 +112,8 @@ export const DataProvider = ({ children }) => {
   const registrationsRef = useRef(registrations);
   const feedbackRef = useRef(feedback);
   const regSettingsRef = useRef(regSettings);
+  const scoreAssessmentsRef = useRef(scoreAssessments);
 
-  // Update refs setiap kali state berubah
   useEffect(() => { usersRef.current = users; }, [users]);
   useEffect(() => { kegiatanRef.current = kegiatan; }, [kegiatan]);
   useEffect(() => { submissionsRef.current = submissions; }, [submissions]);
@@ -99,11 +122,12 @@ export const DataProvider = ({ children }) => {
   useEffect(() => { registrationsRef.current = registrations; }, [registrations]);
   useEffect(() => { feedbackRef.current = feedback; }, [feedback]);
   useEffect(() => { regSettingsRef.current = regSettings; }, [regSettings]);
+  useEffect(() => { scoreAssessmentsRef.current = scoreAssessments; }, [scoreAssessments]);
 
   // ===== REALTIME LISTENERS =====
   useEffect(() => {
     let loadedCount = 0;
-    const totalDocs = 8;
+    const totalDocs = 9;
     const checkLoaded = () => { loadedCount++; if (loadedCount >= totalDocs) setLoading(false); };
 
     const unsubs = [
@@ -164,8 +188,15 @@ export const DataProvider = ({ children }) => {
         } else {
           const defaults = { isOpen: true, waNumber: '6281234567890' };
           setRegSettings(defaults);
-          setDoc(DOCS.regSettings, defaults).catch(() => {});
+          setDoc(DOCS.regSettings, defaults).catch(() => { });
         }
+        checkLoaded();
+      }, () => checkLoaded()),
+
+      // === SCORING ASSESSMENTS LISTENER ===
+      onSnapshot(DOCS.scoreAssessments, (snap) => {
+        setScoreAssessments(snap.exists() && snap.data().items ? snap.data().items : []);
+        if (!snap.exists()) saveToFirestore('scoreAssessments', []);
         checkLoaded();
       }, () => checkLoaded()),
     ];
@@ -209,6 +240,16 @@ export const DataProvider = ({ children }) => {
   const deleteUser = useCallback(async (id) => {
     const updated = usersRef.current.filter(u => u.id !== id);
     await saveToFirestore('users', updated);
+  }, []);
+
+  const changePassword = useCallback(async (userId, oldPassword, newPassword) => {
+    const user = usersRef.current.find(u => u.id === userId);
+    if (!user) return { error: 'User tidak ditemukan' };
+    if (user.password !== oldPassword) return { error: 'Password lama salah' };
+    if (newPassword.length < 4) return { error: 'Password baru minimal 4 karakter' };
+    const updated = usersRef.current.map(u => u.id === userId ? { ...u, password: newPassword } : u);
+    await saveToFirestore('users', updated);
+    return { success: true };
   }, []);
 
   // ===== KEGIATAN FUNCTIONS =====
@@ -392,23 +433,62 @@ export const DataProvider = ({ children }) => {
     await saveToFirestore('feedback', updated);
   }, []);
 
+  // ========================================
+  // ===== SCORING SYSTEM (Simplified) =====
+  // Assessment: admin menilai user yang sudah absen di kegiatan
+  // Skor awal semua member = 100
+  const SKOR_AWAL = 100;
+
+  const addScoreAssessment = useCallback(async (data) => {
+    const id = `sa-${Date.now()}`;
+    const assessment = {
+      id,
+      userId: data.userId,
+      kegiatanId: data.kegiatanId,
+      kategori: data.kategori, // rapat/progja/panitia
+      nilai: Number(data.nilai),
+      catatan: data.catatan || '',
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [...scoreAssessmentsRef.current, assessment];
+    await saveToFirestore('scoreAssessments', updated);
+  }, []);
+
+  const updateScoreAssessment = useCallback(async (id, data) => {
+    const updated = scoreAssessmentsRef.current.map(a =>
+      a.id === id ? { ...a, nilai: Number(data.nilai), catatan: data.catatan || '' } : a
+    );
+    await saveToFirestore('scoreAssessments', updated);
+  }, []);
+
+  const deleteScoreAssessment = useCallback(async (id) => {
+    const updated = scoreAssessmentsRef.current.filter(a => a.id !== id);
+    await saveToFirestore('scoreAssessments', updated);
+  }, []);
+
+  // Hitung skor user berdasarkan semua assessments-nya
+  const getUserScore = useCallback((userId) => {
+    const userAssessments = scoreAssessmentsRef.current.filter(a => a.userId === userId);
+    return hitungSkor(userAssessments, SKOR_AWAL);
+  }, [scoreAssessments]);
+
+  // Cek apakah user sudah dinilai untuk kegiatan tertentu
+  const getAssessment = useCallback((userId, kegiatanId) => {
+    return scoreAssessmentsRef.current.find(a => a.userId === userId && a.kegiatanId === kegiatanId);
+  }, [scoreAssessments]);
+
   const value = {
-    // State (untuk render)
     users, kegiatan, submissions, attendance, forum, registrations, feedback, regSettings, loading,
-    // User
-    loginUser, createUser, updateUser, deleteUser,
-    // Kegiatan
+    scoreAssessments, BOBOT, SKOR_AWAL,
+    loginUser, createUser, updateUser, deleteUser, changePassword,
     getKegiatanById, createKegiatan, updateKegiatan, deleteKegiatan, computeStatus,
-    // Submissions
     getSubmissionsByKegiatan, getSubmissionsByUser, getUserSubmission, submitAnswer,
-    // Attendance
     getAttendanceByKegiatan, getUserAttendance, recordAttendance, getAllCodesForKegiatan, generateAttendanceCode,
-    // Forum
     getTopicById, createTopic, addReply, deleteTopic,
-    // Registrations
     submitRegistration, updateRegStatus, deleteRegistration, toggleRegistration,
-    // Feedback
     submitFeedback, deleteFeedback,
+    addScoreAssessment, updateScoreAssessment, deleteScoreAssessment,
+    getUserScore, getAssessment,
   };
 
   return (
@@ -417,3 +497,4 @@ export const DataProvider = ({ children }) => {
     </DataContext.Provider>
   );
 };
+
